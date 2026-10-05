@@ -1,52 +1,55 @@
 import numpy as np
 def sigmoid(x):
-    return 1/(1+np.exp(-x))
+    return 1 / (1 + np.exp(-x))
+    
+    
 class TwoLayerMLP:
-    def __init__(self, input_size, hidden_size, output_size, learning_rate = 0.1):
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
+
+    def __init__(self, input_size, hidden_size, output_size,
+                 learning_rate=0.1):
         self.learning_rate = learning_rate
-        self.W1 = np.random.randn(input_size, hidden_size) *0.1
-        self.b1 = np.random.randn(1, hidden_size) * 0.1
+        # Parameters
+        self.W1 = np.random.randn(input_size, hidden_size) * 0.1
+        self.b1 = np.zeros((1, hidden_size))
+
         self.W2 = np.random.randn(hidden_size, output_size) * 0.1
-        self.b2 = np.random.randn(1, output_size) * 0.1
+        self.b2 = np.zeros((1, output_size))
     def forward(self, X):
+
+        # Layer 1
         self.Z1 = X @ self.W1 + self.b1
         self.A1 = np.tanh(self.Z1)
-        self.Z2 = self.A1 @ self.W2
+        # Layer 2
+        self.Z2 = self.A1 @ self.W2 + self.b2
         self.A2 = sigmoid(self.Z2)
         return self.A2
     def compute_loss(self, y_hat, y):
-        m = len(y_hat)
-        y_hat = np.clip(y_hat, a_min = 0.00000001, a_max = 0.99999999)
-        return (y * np.log(y_hat) + (1-y)*np.log(1-y_hat))/m
+        y_hat = np.clip(y_hat, 1e-8, 1 - 1e-8)
+        return -np.mean(
+            y * np.log(y_hat)
+            + (1 - y) * np.log(1 - y_hat)
+        )
     def backward(self, X, y):
         m = X.shape[0]
-
         dZ2 = self.A2 - y
-
         self.dW2 = (self.A1.T @ dZ2) / m
         self.db2 = np.sum(dZ2, axis=0, keepdims=True) / m
-
         dA1 = dZ2 @ self.W2.T
         dZ1 = dA1 * (1 - self.A1 ** 2)
 
         self.dW1 = (X.T @ dZ1) / m
-        self.db1 = np.sum(dZ1, axis=0, keepdims=True) / m   
-        print("W1:", self.W1.shape, "dW1:", self.dW1.shape)
-        print("b1:", self.b1.shape, "db1:", self.db1.shape)
-        print("W2:", self.W2.shape, "dW2:", self.dW2.shape)
-        print("b2:", self.b2.shape, "db2:", self.db2.shape)     
+        self.db1 = np.sum(dZ1, axis=0, keepdims=True) / m
     def step(self):
-        self.W2 -= self.learning_rate * self.dW2
-        self.b2 -= self.learning_rate * self.db2
         self.W1 -= self.learning_rate * self.dW1
         self.b1 -= self.learning_rate * self.db1
+
+        self.W2 -= self.learning_rate * self.dW2
+        self.b2 -= self.learning_rate * self.db2
+
     def predict(self, X):
         probabilities = self.forward(X)
         return (probabilities >= 0.5).astype(int)
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     np.random.seed(42)
 
     X = np.array([
@@ -87,5 +90,5 @@ if __name__ == "__main__":
     print(model.forward(X))
 
     print("Final predictions:")
-    print(model.predict(X))
+    print(model.predict(X)) """
 
