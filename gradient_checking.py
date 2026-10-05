@@ -23,7 +23,7 @@ def gradient_check(row,col, X, y):
     weight = model.W1[row, col]
     y_hat = model.forward(X)
     model.backward(X, y)
-    analytic_gradient  = model.dW1[row,col] 
+    analytic_gradient  = model.dW1[row, col] 
     W_one = weight + epsilon
     W_two = weight - epsilon
     model.W1[row,col] = W_one #set the first weight on W1 to our changed value
