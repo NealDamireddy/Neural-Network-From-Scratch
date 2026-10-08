@@ -3,6 +3,7 @@ from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_circles
 import numpy as np
+from pathlib import Path
 learning_rate = 0.01
 class Model(torch.nn.Module):
     def __init__(self, n_inputs, n_outputs, hidden_neurons):
@@ -32,7 +33,7 @@ y_test = torch.tensor(y_test).float()
 loss_function = torch.nn.BCEWithLogitsLoss()
 model = Model(2, 1, 16)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-for epoch in range(5000):
+"""for epoch in range(5000):
     y_hat = model(X_train)
     loss = loss_function(y_hat, y_train)
     loss.backward()
@@ -49,4 +50,7 @@ with torch.no_grad():
     correct = (y_test == predictions)
     accuracy = correct.float().mean()
 print("Test accuracy:", accuracy.item())
-    
+save_path = Path.home() / "circle_model.pth"
+torch.save(model.state_dict(), save_path)
+
+print("Saved model to:", save_path)"""
